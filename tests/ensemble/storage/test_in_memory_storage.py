@@ -1,7 +1,5 @@
 import unittest
 
-from rustic_ai.ensemble.storage import InMemoryEnsembleStorage
-
 from .ensemble_storage_base_test import AbstractTests
 
 
@@ -13,13 +11,8 @@ class TestInMemoryEnsembleStorage(AbstractTests.TestEnsembleStorageABC, unittest
     returns an instance of the InMemoryEnsembleStorage class.
     """
 
-    def get_storage(self):
-        """
-        Get an instance of the InMemoryEnsembleStorage class.
-
-        :return: An instance of the InMemoryEnsembleStorage class
-        """
-        return InMemoryEnsembleStorage()
+    def get_storage_config(self) -> dict:
+        return {'ensemble': {'storage': {'type': 'MEMORY'}}}
 
 
 if __name__ == '__main__':

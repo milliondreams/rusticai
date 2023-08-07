@@ -11,7 +11,7 @@ class RedisStorage(StorageBackend):
     RedisStorage represents a Redis-based storage system for the message bus.
     """
 
-    def __init__(self, redis_connection: redis.StrictRedis):
+    def __init__(self, redis_connection: str, redis_class=redis.StrictRedis):
         """
         Initialize the storage with Redis connection parameters.
 
@@ -19,18 +19,8 @@ class RedisStorage(StorageBackend):
         :param port: The port of the Redis server.
         :param db: The database number to use in the Redis server.
         """
-        self.redis = redis_connection
-
-    @classmethod
-    def create_storage(cls, host: str, port: int, db: int):
-        """
-        Initialize the storage with Redis connection parameters.
-
-        :param host: The hostname of the Redis server.
-        :param port: The port of the Redis server.
-        :param db: The database number to use in the Redis server.
-        """
-        return cls(redis.Redis(host=host, port=port, db=db))
+        # instantiate the Redis client from the provided class and connection string
+        self.redis = redis_class.from_url(redis_connection, decode_responses=True)
 
     def create_inbox(self, message_bus_id: str, client_id: str) -> None:
         """

@@ -7,6 +7,7 @@ from rustic_ai.ensemble.storage import (
     EnsembleNotFoundError,
     EnsembleStorage,
 )
+from rustic_ai.ensemble.storage.ensemble_factory import EnsembleStorageFactory
 
 
 class AbstractTests(object):
@@ -17,19 +18,29 @@ class AbstractTests(object):
         This class defines a set of tests that can be used to test any ensemble storage implementation
         that implements the `EnsembleStorage` interface.
 
-        To use this class, you need to subclass it and implement the `get_storage()` method to return an
+        To use this class, you need to subclass it and implement the `get_storage_config()` method to return an
         instance of the ensemble storage implementation you want to test.
 
         """
 
         @abstractmethod
+        def get_storage_config(self) -> dict:
+            """
+            Get the configuration for the ensemble storage implementation to test.
+
+            :return: The configuration for the ensemble storage implementation
+            """
+            pass
+
         def get_storage(self) -> EnsembleStorage:
             """
             Get an instance of the ensemble storage implementation to test.
 
             :return: An instance of the ensemble storage implementation
             """
-            pass
+            if '_storage' not in self.__dict__:
+                self._storage = EnsembleStorageFactory.from_config(self.get_storage_config())
+            return self._storage
 
         def setUp(self):
             """

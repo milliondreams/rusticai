@@ -14,11 +14,11 @@ class RedisEnsembleStorage(EnsembleStorage):
     Uses Redis hashes to store ensemble data.
     """
 
-    def __init__(self, redis_client: redis.Redis):
+    def __init__(self, redis_connection: str, redis_class=redis.StrictRedis):
         """
         Initializes the Redis client.
         """
-        self.redis = redis_client
+        self.redis = redis_class.from_url(redis_connection, decode_responses=True)
 
     def _get_ensemble_key(self, ensemble_id: str) -> str:
         """

@@ -2,14 +2,20 @@ import time
 from abc import ABC, abstractmethod
 
 from rustic_ai.messagebus import Message, StorageBackend
+from rustic_ai.messagebus.storage.backend_factory import StorageBackendFactory
 from rustic_ai.messagebus.utils import GemstoneGenerator, Priority
 
 
 class AbstractTests(object):
     class TestStorageBackendABC(ABC):
         @abstractmethod
-        def get_storage_backend(self) -> StorageBackend:
+        def get_storage_config(self) -> dict:
             pass
+
+        def get_storage_backend(self) -> StorageBackend:
+            if '_storage' not in self.__dict__:
+                self._storage = StorageBackendFactory.from_config(self.get_storage_config())
+            return self._storage
 
         def setUp(self):
             self.storage = self.get_storage_backend()
