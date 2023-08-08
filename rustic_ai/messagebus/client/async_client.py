@@ -12,14 +12,14 @@ class AsyncClient(Client):
     An asynchronous implementation of the Client, using asyncio's Queue to manage messages.
     """
 
-    def __init__(self, client_id: str, message_bus: MessageBus) -> None:
+    def __init__(self, client_id: str, message_bus: MessageBus, listener: bool = False) -> None:
         """
         Initialize the asynchronous client with a unique ID and a reference to the message bus.
 
         :param client_id: Unique identifier for this client
         :param message_bus: Reference to the message bus instance
         """
-        super().__init__(client_id, message_bus)
+        super().__init__(client_id, message_bus, listener)
 
     def get_next_unread_message(self) -> Optional[Message]:
         """

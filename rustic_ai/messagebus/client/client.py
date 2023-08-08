@@ -11,7 +11,7 @@ class Client(ABC):
     An abstract base class for a client that communicates via the message bus.
     """
 
-    def __init__(self, client_id: str, message_bus: MessageBus) -> None:
+    def __init__(self, client_id: str, message_bus: MessageBus, listener: bool = False):
         """
         Initialize the client with a unique ID and a reference to the message bus.
 
@@ -22,7 +22,7 @@ class Client(ABC):
         self.message_bus: MessageBus = message_bus
         self.last_read_message_id: int = 0
 
-        self.message_bus.register_client(self)
+        self.message_bus.register_client(self, listener=listener)
 
     def __del__(self):  # pragma: no cover
         if hasattr(self, 'message_bus'):

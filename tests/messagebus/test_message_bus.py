@@ -61,6 +61,16 @@ class TestMessageBus(unittest.TestCase):
         self.assertEqual(len(self.message_bus.storage.inboxes[self.message_bus.id]['client_2']), 0)
         self.assertEqual(len(self.message_bus.storage.inboxes[self.message_bus.id]['client_3']), 0)
 
+    # Test all messages are delivered clients registered as listeners
+    def test_all_messages_delivered(self):
+        SimpleClient('listener', self.message_bus, listener=True)
+
+        message = self.client_1.send_message({"data": "Hello"}, ['client_2', 'client_3'])
+
+        # The message should have been delivered to the listener
+        self.assertEqual(len(self.message_bus.storage.inboxes[self.message_bus.id]['listener']), 1)
+        self.assertEqual(self.message_bus.storage.inboxes[self.message_bus.id]['listener'][0].content, message.content)
+
 
 if __name__ == '__main__':
     unittest.main()

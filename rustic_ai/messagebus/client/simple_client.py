@@ -11,14 +11,14 @@ class SimpleClient(Client):
     A simple implementation of the Client abstract base class.
     """
 
-    def __init__(self, client_id: str, message_bus: MessageBus) -> None:
+    def __init__(self, client_id: str, message_bus: MessageBus, listener: bool = False) -> None:
         """
         Initialize the simple client with a unique ID and a reference to the message bus.
 
         :param client_id: Unique identifier for this client
         :param message_bus: Reference to the message bus instance
         """
-        super().__init__(client_id, message_bus)
+        super().__init__(client_id, message_bus, listener)
         self.new_message_event = threading.Event()
         self.lock = threading.Lock()
 

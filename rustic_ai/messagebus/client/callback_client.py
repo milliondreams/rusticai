@@ -11,7 +11,13 @@ class CallbackClient(Client):
     A client implementation that uses a callback function to process incoming messages.
     """
 
-    def __init__(self, client_id: str, message_bus: MessageBus, message_callback: Callable[[Message], None]) -> None:
+    def __init__(
+        self,
+        client_id: str,
+        message_bus: MessageBus,
+        message_callback: Callable[[Message], None],
+        listener: bool = False,
+    ) -> None:
         """
         Initialize the callback client with a unique ID, a reference to the message bus, and a callback function.
 
@@ -19,7 +25,7 @@ class CallbackClient(Client):
         :param message_bus: Reference to the message bus instance
         :param message_callback: The callback function to be triggered when a new message arrives
         """
-        super().__init__(client_id, message_bus)
+        super().__init__(client_id, message_bus, listener)
         if not callable(message_callback):
             raise TypeError('message_callback must be a callable function')
         self.message_callback: Callable[[Message], None] = message_callback

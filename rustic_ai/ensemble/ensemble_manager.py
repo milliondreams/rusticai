@@ -207,9 +207,6 @@ class EnsembleManager:
             message_callback=callback,
         )
 
-        # Add the client to the message bus
-        message_bus.register_client(client)
-
         ensemble_map.clients[ensemble_member.id] = client
 
         return EnsembleMemberMap(member=ensemble_member, client=client)

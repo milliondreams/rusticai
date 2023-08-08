@@ -37,6 +37,7 @@ class MessageBus:
         self.id_generator: GemstoneGenerator = GemstoneGenerator(machine_id)
         self.storage: StorageBackend = storage_backend or InMemoryStorage()
         self.routing_policy: RoutingPolicy = routing_policy or BroadcastRoutingPolicy()
+        self.listeners: List[str] = []
 
     def generate_message_id(self, priority: Priority) -> int:
         """
@@ -46,7 +47,7 @@ class MessageBus:
         """
         return self.id_generator.get_id(priority).to_int()
 
-    def register_client(self, client: 'Client') -> None:
+    def register_client(self, client: 'Client', listener: bool = False) -> None:
         """
         Register a new client with the MessageBus.
 
@@ -54,6 +55,9 @@ class MessageBus:
         """
         self.clients[client.client_id] = client
         self.storage.create_inbox(self.id, client.client_id)
+
+        if listener:
+            self.listeners.append(client.client_id)
 
     def unregister_client(self, client: 'Client') -> None:
         """
@@ -63,6 +67,8 @@ class MessageBus:
         """
         self.clients.pop(client.client_id, None)
         self.storage.remove_inbox(self.id, client.client_id)
+        if client.client_id in self.listeners:
+            self.listeners.remove(client.client_id)
 
     def send_message(self, message: Message) -> None:
         """
@@ -71,14 +77,23 @@ class MessageBus:
         :param message: The message to send
         """
 
+        # Check if recipients are valid
         if set(message.recipients).difference(self.clients.keys()):
             raise ValueError("Invalid recipient(s) specified")
 
+        # Get the recipients from the routing policy
         if message.recipients:
             recipients = message.recipients
         else:
             recipients = self.routing_policy.get_recipients(message, self.clients)
 
+        # Add listeners to the list of recipients is listeners is not empty
+        if self.listeners:
+            recipients.extend(self.listeners)
+
+        recipients = list(set(recipients))
+
+        # Add message to the recipient's inbox
         for recipient_id in recipients:
             self.storage.add_message_to_inbox(self.id, recipient_id, message)
 
