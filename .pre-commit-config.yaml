@@ -32,4 +32,4 @@ repos:
     hooks:
       - id: mypy
         exclude: tests/
-        additional_dependencies: [ sqlalchemy-stubs==0.4, types-redis==4.5.4.1 ]
+        additional_dependencies: [ sqlalchemy-stubs==0.4, types-redis==4.6.0.3, types-PyYAML==6.0.12.11 ]

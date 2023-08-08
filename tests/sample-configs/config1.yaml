@@ -1,0 +1,6 @@
+ensemble:
+  storage:
+    type: MEMORY
+message_bus:
+  storage:
+    type: MEMORY

@@ -121,6 +121,14 @@ class Ensemble:
         """Get a member from the ensemble."""
         return self.members[member_id]
 
+    def activate_member(self, member_id: str):
+        """Activate a member in the ensemble."""
+        self.members[member_id].activate()
+
+    def deactivate_member(self, member_id: str):
+        """Deactivate a member in the ensemble."""
+        self.members[member_id].deactivate()
+
     def serialize(self):
         """Serialize the ensemble to a JSON string."""
         return json.dumps(self, cls=EnsembleEncoder)
