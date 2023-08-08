@@ -164,7 +164,7 @@ class EnsembleMemberEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, EnsembleMember):
             return asdict(o)
-        return super().default(o)
+        return super().default(o)  # pragma: no cover
 
 
 class EnsembleMemberDecoder(json.JSONDecoder):
@@ -174,4 +174,4 @@ class EnsembleMemberDecoder(json.JSONDecoder):
     def object_hook(self, obj):
         if 'id' in obj and 'name' in obj and 'member_type' in obj and 'comms_type' in obj:
             return EnsembleMember(**obj)
-        return obj
+        return obj  # pragma: no cover

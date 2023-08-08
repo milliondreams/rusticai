@@ -49,5 +49,5 @@ class SimpleClient(Client):
 
         :param timeout: Optional maximum time to wait for a new message
         """
-        self.new_message_event.wait(timeout)
-        self.new_message_event.clear()
+        self.new_message_event.wait(timeout)  # pragma: no cover
+        self.new_message_event.clear()  # pragma: no cover

@@ -4,7 +4,7 @@ from mailbox import Message
 
 from rustic_ai.ensemble.ensemble import MemberCommsType, MemberType
 from rustic_ai.ensemble.ensemble_manager import EnsembleManager
-from rustic_ai.ensemble.storage.exceptions import EnsembleNotFoundError
+from rustic_ai.ensemble.storage.exceptions import EnsembleMemberNotFoundError, EnsembleNotFoundError
 
 
 class TestEnsembleManager(unittest.TestCase):
@@ -25,9 +25,6 @@ class TestEnsembleManager(unittest.TestCase):
         ensemble_map = self.manager.create_ensemble('Test Ensemble')
         ensemble = ensemble_map.ensemble
 
-        # Save the ensemble to storage
-        self.manager.ensemble_storage.update_ensemble(ensemble)
-
         # Load the ensemble from storage
         loaded_ensemble_map = self.manager.load_ensemble(ensemble.id)
         loaded_ensemble = loaded_ensemble_map.ensemble
@@ -36,6 +33,16 @@ class TestEnsembleManager(unittest.TestCase):
         self.assertEqual(loaded_ensemble.id, ensemble.id)
         self.assertEqual(loaded_ensemble.name, ensemble.name)
         self.assertEqual(len(loaded_ensemble.members), len(ensemble.members))
+
+        # Tests that an existing ensemble can be retrieved from another ensemble manager
+        manager2 = EnsembleManager('./tests/sample-configs/config1.yaml')
+        loaded_ensemble_map2 = manager2.load_ensemble(ensemble.id)
+        loaded_ensemble2 = loaded_ensemble_map2.ensemble
+
+        # Assert that the loaded ensemble is the same as the original ensemble
+        self.assertEqual(loaded_ensemble2.id, ensemble.id)
+        self.assertEqual(loaded_ensemble2.name, ensemble.name)
+        self.assertEqual(len(loaded_ensemble2.members), len(ensemble.members))
 
     # Tests that a new ensemble member is created with valid parameters
     def test_create_ensemble_member_valid_params(self):
@@ -130,3 +137,23 @@ class TestEnsembleManager(unittest.TestCase):
     def test_nonexistent_ensemble_member(self):
         with self.assertRaises(EnsembleNotFoundError):
             self.manager.get_ensemble_member('nonexistent_ensemble_id', 'nonexistent_member_id')
+
+    # Test that attempting to get a non-existent ensemble member raises an error.
+    def test_nonexistent_member(self):
+        # Create a new ensemble
+        ensemble_map = self.manager.create_ensemble('Test Ensemble')
+
+        with self.assertRaises(EnsembleMemberNotFoundError):
+            self.manager.get_ensemble_member(ensemble_map.ensemble.id, 'nonexistent_member_id')
+
+    # Test that attempting to deactivate a non-existent ensemble member raises an error.
+    def test_deactivate_nonexistent_member(self):
+        # Create a new ensemble
+        ensemble_map = self.manager.create_ensemble('Test Ensemble')
+
+        with self.assertRaises(EnsembleMemberNotFoundError):
+            self.manager.deactivate_ensemble_member(ensemble_map.ensemble.id, 'nonexistent_member_id')
+
+
+if __name__ == '__main__':
+    unittest.main()

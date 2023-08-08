@@ -254,3 +254,5 @@ class EnsembleManager:
                     del ensemble_map.clients[member_id]
                 ensemble.deactivate_member(member_id)
                 self.ensemble_storage.update_ensemble(ensemble)
+        else:
+            raise EnsembleMemberNotFoundError
