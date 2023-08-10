@@ -109,7 +109,7 @@ class AbstractTests(object):
             updated1 = self.storage.get_ensemble(ensemble_id)
             self.assertCountEqual(updated1.members.keys(), ["1", "2"])
 
-        def test_list_ensemble_ids(self):
+        def test_list_methods(self):
             """
             Test listing ensemble IDs from the storage.
 
@@ -123,8 +123,13 @@ class AbstractTests(object):
                 ensemble = Ensemble(f"teste{i}", f"Test Ensemble {i}")
                 ensemble_ids.append(self.storage.create_ensemble(ensemble))
 
-            retrieved_ids = self.storage.list_ensemble_ids()
+            retrieved_ids = self.storage.get_ensemble_ids()
+
+            retrieved_ensembles = self.storage.get_ensembles()
+            retrieved_ensemble_ids = [ensemble.id for ensemble in retrieved_ensembles]
+
             self.assertCountEqual(retrieved_ids, ensemble_ids)
+            self.assertCountEqual(retrieved_ensemble_ids, ensemble_ids)
 
         def test_get_missing_ensemble(self):
             """

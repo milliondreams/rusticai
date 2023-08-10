@@ -137,7 +137,15 @@ class FileEnsembleStorage(EnsembleStorage):
         del ensemble.members[member_id]
         self.update_ensemble(ensemble)
 
-    def list_ensemble_ids(self) -> List[str]:
+    def get_ensembles(self) -> List[Ensemble]:
+        """
+        List all ensembles stored in the file storage.
+
+        :return: A list of ensemble objects
+        """
+        return [self.get_ensemble(ensemble_id) for ensemble_id in self.get_ensemble_ids()]
+
+    def get_ensemble_ids(self) -> List[str]:
         """
         List the IDs of all ensembles stored in the file storage.
 

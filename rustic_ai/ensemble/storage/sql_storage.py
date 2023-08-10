@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import Boolean, Column, ForeignKey, String, create_engine, exc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -166,7 +168,38 @@ class SqlEnsembleStorage(EnsembleStorage):
             # Delete the ensemble and its associated members from the database
             session.delete(ensemble)
 
-    def list_ensemble_ids(self):
+    def get_ensembles(self) -> List[Ensemble]:
+        """
+        Lists all ensembles stored in the SQL database.
+
+        Returns:
+            List[Ensemble]: A list of Ensemble objects.
+        """
+        with self.Session() as session:
+            # Query the database for all EnsembleModel objects
+            ensembles = session.query(EnsembleModel).all()
+
+            # Create an Ensemble object from the retrieved data for each ensemble
+            return [
+                Ensemble(
+                    id=ensemble.id,
+                    name=ensemble.name,
+                    members={
+                        m.id: EnsembleMember(
+                            id=m.id,
+                            name=m.name,
+                            member_type=m.member_type,
+                            comms_type=m.comms_type,
+                            endpoint=m.endpoint,
+                            is_active=m.is_active,
+                        )
+                        for m in ensemble.members
+                    },
+                )
+                for ensemble in ensembles
+            ]
+
+    def get_ensemble_ids(self):
         """
         Lists the IDs of all ensembles stored in the SQL database.
 

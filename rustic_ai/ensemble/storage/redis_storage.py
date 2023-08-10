@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import List
 
 import redis
 
@@ -98,7 +98,17 @@ class RedisEnsembleStorage(EnsembleStorage):
         data = ensemble.serialize()
         self.redis.hset(ensemble_key, 'd', data)
 
-    def list_ensemble_ids(self) -> list:
+    def get_ensembles(self) -> List[Ensemble]:
+        """
+        Lists all ensembles in Redis.
+
+        Returns:
+            List[Ensemble]: A list of ensembles.
+        """
+        all_keys = self.redis.keys("ensemble:*")
+        return [self.get_ensemble(key[9:]) for key in all_keys]
+
+    def get_ensemble_ids(self) -> list:
         """
         Lists all ensembles in Redis.
 
@@ -132,15 +142,6 @@ class RedisEnsembleStorage(EnsembleStorage):
 
         # Update ensemble JSON
         self.update_ensemble(ensemble)
-
-    def get_ensemble_members(self, ensemble_id: str) -> Dict[str, EnsembleMember]:
-        """
-        Get all members of an ensemble from Redis.
-        """
-        # Get ensemble
-        ensemble = self.get_ensemble(ensemble_id)
-
-        return ensemble.members
 
     def remove_ensemble_member(self, ensemble_id: str, member_id: str) -> None:
         """

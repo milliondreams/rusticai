@@ -104,7 +104,16 @@ class InMemoryEnsembleStorage(EnsembleStorage):
 
         del self.ensembles[ensemble_id].members[member_id]
 
-    def list_ensemble_ids(self) -> List[str]:
+    def get_ensembles(self) -> List[Ensemble]:
+        """
+        Lists all ensembles.
+
+        Returns:
+            List[Ensemble]: A list of ensembles.
+        """
+        return list(self.ensembles.values())
+
+    def get_ensemble_ids(self) -> List[str]:
         """
         Lists all ensemble IDs.
 

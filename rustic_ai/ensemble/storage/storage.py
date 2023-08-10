@@ -28,7 +28,12 @@ class EnsembleStorage(ABC):
         pass  # pragma: no cover
 
     @abstractmethod
-    def list_ensemble_ids(self) -> List[str]:
+    def get_ensembles(self) -> List[Ensemble]:
+        """List all ensembles"""
+        pass  # pragma: no cover
+
+    @abstractmethod
+    def get_ensemble_ids(self) -> List[str]:
         """List all ensemble ids"""
         pass  # pragma: no cover
 

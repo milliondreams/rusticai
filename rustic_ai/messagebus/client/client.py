@@ -29,7 +29,13 @@ class Client(ABC):
             self.message_bus.unregister_client(self)
 
     def send_message(
-        self, content: JSON, recipients: Optional[List[str]] = None, priority: Priority = Priority.NORMAL
+        self,
+        content: JSON,
+        recipients: Optional[List[str]] = None,
+        priority: Priority = Priority.NORMAL,
+        thread_id: Optional[int] = None,
+        in_reply_to: Optional[int] = None,
+        topic: Optional[str] = None,
     ) -> Message:
         """
         Send a message through the message bus.
@@ -40,7 +46,16 @@ class Client(ABC):
         """
         assert isinstance(content, Dict)
         message_id = self.message_bus.generate_message_id(priority)
-        message = Message(message_id, sender=self.client_id, content=content, recipients=recipients, priority=priority)
+        message = Message(
+            message_id,
+            sender=self.client_id,
+            content=content,
+            recipients=recipients,
+            priority=priority,
+            thread_id=thread_id,
+            in_reply_to=in_reply_to,
+            topic=topic,
+        )
         self.message_bus.send_message(message)
         return message
 

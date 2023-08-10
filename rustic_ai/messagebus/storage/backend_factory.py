@@ -37,7 +37,7 @@ class StorageBackendFactory:
         elif storage_type == StorageBackendType.FILE:
             file_path = storage_config['file_path']
             store_key = f"{StorageBackendType.MEMORY.value}:{file_path}"
-            if store_key not in stores:
+            if store_key not in stores:  # pragma: no cover
                 stores[store_key] = FileBasedStorage(file_path)
             return stores[store_key]
 

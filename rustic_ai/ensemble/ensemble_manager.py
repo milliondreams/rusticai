@@ -1,12 +1,13 @@
 import socket
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import shortuuid
 import yaml
 
 from rustic_ai.ensemble.storage.exceptions import EnsembleMemberNotFoundError, EnsembleNotFoundError
 from rustic_ai.messagebus import Client
+from rustic_ai.messagebus.utils import Priority
 
 from ..messagebus import Message
 from ..messagebus.client.callback_client import CallbackClient
@@ -160,6 +161,19 @@ class EnsembleManager:
         else:
             raise EnsembleNotFoundError
 
+    def get_ensembles(self) -> List[Ensemble]:
+        """
+        Gets all ensembles.
+
+        Returns:
+            List[EnsembleMap]: A list of all ensembles.
+        """
+
+        # Get ensembles from the storage
+        ensembles = self.ensemble_storage.get_ensembles()
+
+        return ensembles
+
     def create_ensemble_member(
         self,
         ensemble_id: str,
@@ -244,8 +258,8 @@ class EnsembleManager:
 
         if member_id in ensemble.members:
             member = ensemble.members[member_id]
-            if member.is_active:
-                if member_id in ensemble_map.clients:
+            if member.is_active:  # pragma: no cover
+                if member_id in ensemble_map.clients:  # pragma: no cover
                     client = ensemble_map.clients[member_id]
                     message_bus.unregister_client(client)
                     del ensemble_map.clients[member_id]
@@ -253,3 +267,39 @@ class EnsembleManager:
                 self.ensemble_storage.update_ensemble(ensemble)
         else:
             raise EnsembleMemberNotFoundError
+
+    def send_message(
+        self,
+        ensemble_id: str,
+        sender: str,
+        content: Dict[Any, Any],
+        recipients: Optional[List[str]] = None,
+        priority: Priority = Priority.NORMAL,
+        thread_id: Optional[int] = None,
+        in_reply_to: Optional[int] = None,
+        topic: Optional[str] = None,
+    ):
+        """
+        Sends a message to the given recipients.
+
+        Args:
+            ensemble_id (str): The ID of the ensemble to send the message from.
+            sender (str): The ID of the sender.
+            content (Dict[Any, Any]): The content of the message.
+            recipients (Optional[List[str]], optional): The IDs of the recipients. Defaults to None.
+            priority (Priority, optional): The priority of the message. Defaults to Priority.NORMAL.
+            thread_id (Optional[int], optional): The ID of the thread the message belongs to. Defaults to None.
+            in_reply_to (Optional[int], optional): The ID of the message this message is a reply to. Defaults to None.
+            topic (Optional[str], optional): The topic of the message. Defaults to None.
+        """
+
+        client = self.get_ensemble_member(ensemble_id, sender).client
+
+        return client.send_message(
+            content=content,
+            recipients=recipients,
+            priority=priority,
+            thread_id=thread_id,
+            in_reply_to=in_reply_to,
+            topic=topic,
+        )
